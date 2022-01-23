@@ -1,0 +1,1 @@
+C:\Users\jaseb\Documents\VSCode\emscripten\emsdk\upstream\emscripten\emcc -o build/web/game.html main.c src/checkColliders_Float.c -s TOTAL_MEMORY=134217728 -s ASSERTIONS=1 -Os -Wall ./lib/web/libraylib.a -I. -I include/ -I src/ -L. -L lib/web/ -s USE_GLFW=3 --shell-file ./src/minshell.html --preload-file resources -DPLATFORM_WEB
