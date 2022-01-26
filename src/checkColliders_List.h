@@ -17,7 +17,7 @@
 
     CollisionInfo CheckAllCollisions(CollisionInfo info, int colliderNum, Rectangle* walls, Rectangle self);
     CollisionInfo CheckAllCollisionsNew(int colliderNum, Rectangle* walls, Rectangle self);
-    CollisionInfo CheckColliderColInfo(CollisionInfo info, Rectangle box, Rectangle self);
+    CollisionInfo CheckColliderColInfo(CollisionInfo info, Rectangle box, Rectangle self, int trigger);
 
     CollisionInfo CheckAllCollisionsList(CollisionInfo info, WallPattern* root, Rectangle self);
     CollisionInfo CheckAllCollisionsListNew(WallPattern* root, Rectangle self);

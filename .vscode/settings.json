@@ -5,6 +5,9 @@
         "checkcolliders_list.h": "c",
         "checkcolliders_float.h": "c",
         "stdbool.h": "c",
-        "wallpattern.h": "c"
+        "wallpattern.h": "c",
+        "math.h": "c",
+        "corecrt_math.h": "c",
+        "corecrt_math_defines.h": "c"
     }
 }

@@ -43,9 +43,9 @@ CollisionInfo CheckAllCollisionsNew(int colliderNum, Rectangle* walls, Rectangle
 }
 
 
-CollisionInfo CheckColliderColInfo(CollisionInfo info, Rectangle box, Rectangle self){
+CollisionInfo CheckColliderColInfo(CollisionInfo info, Rectangle box, Rectangle self, int trigger){
     CollisionInfo collision = info;
-    int result = f_checkCollider(box, self, false, true);
+    int result = f_checkCollider(box, self, trigger, true);
     switch(result){
             case 1:
                 collision.left = true;
@@ -59,6 +59,9 @@ CollisionInfo CheckColliderColInfo(CollisionInfo info, Rectangle box, Rectangle 
             case 4:
                 collision.down = true;
                 collision.floor = box.y;
+                break;
+            case 5:
+                collision.trigger = trigger;
                 break;
         }
     return collision;
