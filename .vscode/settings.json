@@ -1,6 +1,10 @@
 {
     "files.associations": {
         "emscripten.h": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "checkcolliders_list.h": "c",
+        "checkcolliders_float.h": "c",
+        "stdbool.h": "c",
+        "wallpattern.h": "c"
     }
 }
