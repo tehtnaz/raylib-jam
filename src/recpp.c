@@ -1,6 +1,6 @@
 #include "raylib.h"
 
-//RecPP.h version 1.1
+//RecPP.h version 1.2
 
 Rectangle addVec2ToRec(Rectangle rec, Vector2 vec2){
     Rectangle temp = rec;
@@ -50,4 +50,8 @@ bool isPointInRec(Rectangle rec, Vector2 point){
 
 Vector2 recToVec(Rectangle input){
     return (Vector2){input.x, input.y};
+}
+
+Rectangle RotateRecCW(Rectangle rec){
+    return (Rectangle){rec.x + rec.height, rec.y, -rec.height, rec.width};
 }

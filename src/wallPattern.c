@@ -86,3 +86,14 @@ WallPattern* WallPatternAtIndex(WallPattern* root, int index){
     }
     return select;
 }
+
+float GreatestWallX(WallPattern* root){
+    WallPattern* select = root;
+    float maxX = 0.0f;
+    //printf("this worked\n");
+    while(select != NULL){
+        if(select->rec.x + select->rec.width > maxX) maxX = select->rec.x + select->rec.width;
+        select = select->next;
+    }
+    return maxX;
+}

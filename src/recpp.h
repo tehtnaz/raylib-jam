@@ -3,10 +3,11 @@
 #define RECPP_H
 #include "raylib.h"
 
-//RecPP.h version 1.1.1
+//RecPP.h version 1.2
 //changelog
 //1.1.1
-//added reczero
+    //added reczero
+//1.2 added rotate rec
 
 #define RECZERO (Rectangle){0,0,0,0}
 
@@ -22,4 +23,7 @@ Rectangle combineVec2(Vector2 position, Vector2 size);
 
 bool isPointInRec(Rectangle rec, Vector2 point);
 Vector2 recToVec(Rectangle input);
+
+Rectangle RotateRecCW(Rectangle rec);
+
 #endif // recpp_h
