@@ -26,7 +26,7 @@ _TODO: Show your game to the world, animated GIFs recommended!._
 
 ### Links
 
- - itch.io Release: $(itch.io Game Page)
+ - itch.io Release: https://tnaz.itch.io/runner
 
 ### License
 
