@@ -250,7 +250,7 @@ void UpdateDrawFrame(){
         player.y = startingPos.y;
         //resetTime = 3.0f;
         speedUpTimer = speedUpResetTime;
-        wallSpeed = -175.0f;
+        wallSpeed = -150.0f;
         while(wallNum > 0){
             KillWall();
         }
