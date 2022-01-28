@@ -22,9 +22,14 @@ typedef enum GameState{
 }GameState;
 
 
+//idea for patterns:
+    //make them more oriented towards the wall jumping rather than going back and forth
+    //add ceiling
+
+
 float velocity = 0.0f;
-const float gravity = 9.81f * 2.5f;
-const float jumpHeight = -15.0f;
+const float gravity = 9.81f * 3.0f;
+const float jumpHeight = -16.0f;
 const float playerSpeed = 325.0f;
 
 const Rectangle ground = {0, 164*3, 900, 100};
@@ -59,6 +64,7 @@ bool jumpDebug = false;
 bool wallHoldDebug = false;
 bool debug = false;
 GameState gameState = STATE_ACTIVE;
+CollisionInfo collision = {0,0,0,0,0,0};
 
 
 void NewWall(){
@@ -100,7 +106,7 @@ void CalculateCollisions(){
 
 
         printf(" ");
-    CollisionInfo collision = {0,0,0,0,0,0};
+    collision = (CollisionInfo){0,0,0,0,0,0};
     for(int i = 0; i < wallNum; i++){
         collision = CheckAllCollisionsList(collision, wallsList[i], player);
     }
@@ -118,7 +124,7 @@ void CalculateCollisions(){
             player.x -= playerSpeed * GetFrameTime();
         }else{
             player.x += wallSpeed * GetFrameTime();
-            if(IsKeyPressed(KEY_W) && wallJump && jumpDebug && velocity > -jumpHeight / 4){
+            if(IsKeyPressed(KEY_W) && wallJump && velocity > -jumpHeight / 4){
                 velocity = jumpHeight;
                 wallJump = false;
             }
@@ -127,7 +133,7 @@ void CalculateCollisions(){
     if(IsKeyDown(KEY_D)){
         if(!collision.right){
             player.x += playerSpeed * GetFrameTime();
-        }else if(IsKeyPressed(KEY_W) && wallJump && jumpDebug && velocity > -jumpHeight / 4){
+        }else if(IsKeyPressed(KEY_W) && wallJump && velocity > -jumpHeight / 4){
             velocity = jumpHeight;
             wallJump = false;
         }
@@ -136,7 +142,7 @@ void CalculateCollisions(){
         velocity = 0;
     }
     if(collision.down && velocity >= 0){
-        player.y = collision.floor - player.height;
+        player.y = collision.floor - player.height + 0.01f;
         velocity = 0;
         if(IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_W)){
             velocity += jumpHeight;
@@ -154,10 +160,16 @@ void CalculateCollisions(){
 }
 
 void DebugVisuals(){
-    //DrawText(TextFormat("%f", resetTime), 0,20,15, WHITE);
-    //DrawRectangleRec(player, RED);
-    //DrawTextureEx(playerAnim.texture, addVec2(recToVec(player), (Vector2){100,0}), 0, 3, WHITE);
-    //DrawTextureEx(playerAnim_flip.texture, addVec2(recToVec(player), (Vector2){100,0}), 0, 3, WHITE);
+    if(debug){
+        DrawText(TextFormat("speedUpTimer: %f\n wallSpeed: %f\nvelocity: %f\nplayer.y: %f\ncollision.floor: %f", speedUpTimer, wallSpeed, velocity, player.y, collision.floor), 700, 0, 15, WHITE);
+        DrawRectangle(870, 391, 20, 9, collision.up ? RED : WHITE);
+        DrawRectangle(861, 400, 9, 20, collision.left ? RED : WHITE);
+        DrawRectangle(890, 400, 9, 20, collision.right ? RED : WHITE);
+        DrawRectangle(870, 420, 20, 9, collision.down ? RED : WHITE);
+
+        DrawRectangle(870, 400, 20, 20, wallJump ? YELLOW : WHITE);
+    }
+    if(jumpDebug) DrawText("Debug Mode Enabled.\nReset with R enabled", 0,0,15, WHITE);
 }
 
 void DrawWallPattern(WallPattern* root){
@@ -173,6 +185,7 @@ void GameVisuals(){
     background.fps = -wallSpeed / 60;
     DrawAnimationPro(&background, (Vector2){0,0}, 3, WHITE, gameState == STATE_ACTIVE ? CYCLE_FORWARD : CYCLE_NONE);
     DrawTextureEx(frame, (Vector2){0,0}, 0, 3, WHITE);
+    //DrawRectangleRec(player, RED);
     //DrawTextureEx(spikeTexture, (Vector2){0,0}, 0, 3, WHITE);
     for(int i = 0; i < wallNum; i++){
         DrawWallPattern(wallsList[i]);
@@ -216,7 +229,7 @@ void WallTimer(){
 }
 
 void BodyFall(){
-    CollisionInfo collision = {0,0,0,0,0,0};
+    collision = (CollisionInfo){0,0,0,0,0,0};
     for(int i = 0; i < wallNum; i++){
         collision = CheckAllCollisionsList(collision, wallsList[i], player);
     }
@@ -224,7 +237,7 @@ void BodyFall(){
     collision = CheckColliderColInfo(collision, spikes, player, 1);
 
     if(collision.down && velocity >= 0){
-        player.y = collision.floor - player.height;
+        player.y = collision.floor - player.height + 0.01f;
         velocity = 0;
         if(IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_W)){
             velocity += jumpHeight;
@@ -273,9 +286,7 @@ void UpdateDrawFrame(){
         ClearBackground(RAYWHITE);
         if(gameState == STATE_ACTIVE  || gameState == STATE_DEAD){
             GameVisuals();
-            //if(debug) DrawText(TextFormat("timer: %f\nresetTimer: %f\nspeedUpTimer: %f\n wallSpeed: %f", timer, resetTime, speedUpTimer, wallSpeed), 0, 0, 15, WHITE);
-            if(debug) DrawText(TextFormat("speedUpTimer: %f\n wallSpeed: %f\nvelocity: %f", speedUpTimer, wallSpeed, velocity), 700, 0, 15, WHITE);
-            if(jumpDebug) DrawText("Debug Mode Enabled.\nWall-Jump Enabled\nReset with R enabled", 0,0,15, WHITE);
+            DebugVisuals();
             if(gameState == STATE_DEAD){
                 DrawText("You died.", player.x + 50 < 700 ? player.x + 50 : 700, player.y > 0 ? (player.y > 467 ? 467 : player.y) : 0, 40, RED);
             }
