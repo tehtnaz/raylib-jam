@@ -1,6 +1,7 @@
 #ifndef ANIMATION_H_2
     #define ANIMATION_H_2
     #include "raylib.h"
+    #include <stdint.h>
 
 // TODO:
 // Maybe split all the sections of the main.c loop into different functions
@@ -27,6 +28,7 @@
 //2.1 changelog
     //use GetFPS instead of screenFPS
     //fixed flipAnimationHorizontal
+    //fixed error printf (added new line char)
 
 
 typedef struct Animation{

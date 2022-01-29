@@ -2,6 +2,7 @@
     #define CHECKCOLLIDERS_LIST_H
     #include <stdbool.h>
     #include "wallPattern.h"
+    #include <stdint.h>
 
     typedef struct CollisionInfo{
         bool left;
@@ -9,6 +10,7 @@
         bool up;
         bool down;
         int trigger;
+        uint64_t triggerObjID;
 
         float floor;
 

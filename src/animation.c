@@ -91,7 +91,7 @@ Animation cycleAnimation(Animation input){
         return input;
     }
     if(input.fps < 0){
-        printf("ERROR: cycleAnimation - Attempted to cycle with negative fps");
+        printf("ERROR: cycleAnimation - Attempted to cycle with negative fps\n");
         return input;
     }
     Animation temp = input;
@@ -117,7 +117,7 @@ Animation cycleAnimationBackwards(Animation input){
         return input;
     }
     if(input.fps < 0){
-        printf("ERROR: cycleAnimationBackwards - Attempted to cycleBackwards with negative fps");
+        printf("ERROR: cycleAnimationBackwards - Attempted to cycleBackwards with negative fps\n");
         return input;
     }
     Animation temp = input;

@@ -3,6 +3,7 @@
 #include "wallPattern.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "colliderType.h"
 
 CollisionInfo CheckAllCollisions(CollisionInfo info, int colliderNum, Rectangle* walls, Rectangle self){
@@ -89,6 +90,7 @@ CollisionInfo CheckAllCollisionsList(CollisionInfo info, WallPattern* root, Rect
                 collision.floor = select->rec.y;
                 break;
             case 5:
+                collision.triggerObjID = (uint64_t)select;
                 collision.trigger = select->trigger;
                 break;
         }

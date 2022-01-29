@@ -1,11 +1,13 @@
 #ifndef WALLPATTERN_H
     #define WALLPATTERN_H
     #include "raylib.h"
+    #include "animation.h"
 
 
     typedef struct WallPattern{
         Rectangle rec;
         int trigger;
+        Animation* anim;
         struct WallPattern* next;
     }WallPattern;
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "wallPattern.h"
+#include "animation.h"
 
 void PrintWallPattern(WallPattern* root){
     if(root == NULL){
@@ -28,6 +29,7 @@ WallPattern* NewRecPattern(Rectangle rec, int trigger){
     WallPattern* block = (WallPattern*)malloc(sizeof(WallPattern));
     block->rec = rec;
     block->trigger = trigger;
+    block->anim = NULL;
     block->next = NULL;
     return block;
 }
@@ -35,12 +37,12 @@ WallPattern* NewRecPattern(Rectangle rec, int trigger){
 void AddRecPattern(WallPattern* root, Rectangle rec, int trigger){
     WallPattern* select = root;
     while(select->next != NULL){
-        printf("!%f,%p;", select->rec.x, select->next);
+        //printf("!%f,%p;", select->rec.x, select->next);
         select = select->next;
     }
-    printf("!%f,%p;", select->rec.x, select->next);
+    //printf("!%f,%p;", select->rec.x, select->next);
     select->next = NewRecPattern(rec, trigger);
-    puts("\n");
+    //puts("\n");
 }
 
 //Must already have the root allocated
@@ -62,6 +64,11 @@ void FreeWallPattern(WallPattern* root){
         next = select->next;
         select->rec = (Rectangle){0,0,0,0};
         select->next = NULL;
+        if(select->anim != NULL){
+            free(select->anim);
+            select->anim = NULL;
+            printf("Freed anim\n");
+        }
         //printf("!!freed %p; ", select);
         //printf("!!child %p\n", select->next);
         free(select);
