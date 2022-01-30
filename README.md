@@ -17,3 +17,5 @@ Keyboard:
 ### Links
 
  - itch.io Release: https://tnaz.itch.io/runner
+
+*Copyright (c) 2022 tehtnaz (tnaz)*
