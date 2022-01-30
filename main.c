@@ -36,6 +36,7 @@ const float playerSpeed = 325.0f;
 
 const Rectangle ground = {0, 164*3, 900, 100};
 const Rectangle spikes = {0,0,21,507};
+const Rectangle ceiling = {0,-100,900,100};
 
 Rectangle player = {100, 50, 50, 50};
 Texture2D stick;
@@ -51,7 +52,7 @@ Texture2D frame;
 Animation background;
 WallPattern* piston;
 WallPattern* basic;
-WallPattern* patternList[4];
+WallPattern* patternList[6];
 WallPattern** wallsList;
 
 //float timer = 0.0f;
@@ -88,7 +89,7 @@ Texture2D trapz;
 
 void NewWall(){
     wallNum++;
-    int rnd = GetRandomValue(0, 3);
+    int rnd = GetRandomValue(0, 5);
     wallsList = realloc(wallsList, wallNum * sizeof(WallPattern*));
     wallsList[wallNum-1] = CopyWallPattern(patternList[rnd]);
 
@@ -96,6 +97,12 @@ void NewWall(){
         wallsList[wallNum-1]->next->next->anim = malloc(sizeof(Animation));
         *(wallsList[wallNum-1]->next->next->anim) = assignProperties(93, 0, 3, false, 4, false);
         wallsList[wallNum-1]->next->next->anim->texture = trapz;
+        printf("Made new animation\n");
+    }
+    if(rnd == 5){
+        wallsList[wallNum-1]->next->next->next->anim = malloc(sizeof(Animation));
+        *(wallsList[wallNum-1]->next->next->next->anim) = assignProperties(93, 0, 3, false, 4, false);
+        wallsList[wallNum-1]->next->next->next->anim->texture = trapz;
         printf("Made new animation\n");
     }
 
@@ -153,6 +160,7 @@ void CalculateCollisions(){
         collision = CheckAllCollisionsList(collision, wallsList[i], player);
     }
     collision = CheckColliderColInfo(collision, ground, player, 0);
+    collision = CheckColliderColInfo(collision, ceiling, player, 0);
     collision = CheckColliderColInfo(collision, spikes, player, 1);
 
     if(collision.right){
@@ -291,6 +299,7 @@ void BodyFall(){
         collision = CheckAllCollisionsList(collision, wallsList[i], player);
     }
     collision = CheckColliderColInfo(collision, ground, player, 0);
+    collision = CheckColliderColInfo(collision, ceiling, player, 0);
     collision = CheckColliderColInfo(collision, spikes, player, 1);
 
     if(collision.down && velocity >= 0){
@@ -451,29 +460,18 @@ int main(void){
     //AddRecPattern(patternList[3], newRec(900 + 78 * 3, 0, 24 * 3, 12 * 3), 0);
     AddRecPattern(patternList[3], newRec(900 + 78 * 3, 38 * 3, 24 * 3, 126 * 3), 0);
 
-    //patternList[0] = NewRecPattern(newRec(900,0,50,400), 0);
-    //AddRecPattern(patternList[0], newRec(890, 0, 10, 100), 1);
-    //patternList[1] = NewRecPattern(newRec(900,100,50,200), 0);
-    //patternList[2] = NewRecPattern(newRec(900,400,50,100), 0);
-    //patternList[3] = NewRecPattern(newRec(900,50,50,100), 0);
+    patternList[4] = NewRecPattern(newRec(900, 51 * 3, 14 * 3, 113* 3), 0);
+    AddRecPattern(patternList[4], newRec(900 + 47 * 3, 28 * 3, 14 * 3, 56 * 3), 0);
+    AddRecPattern(patternList[4], newRec(900 + 47 * 3, 132 * 3, 14 * 3, 32 * 3), 0);
+    AddRecPattern(patternList[4], newRec(900 + 92 * 3, 51 * 3, 14 * 3, 113* 3), 0);
 
-
-    /*basic = NewRecPattern(newRec(10, 20, 30, 30), 0);
-    basic->next = NewRecPattern(newRec(15, 25, 35, 35), 0);
-    AddRecPattern(basic, newRec(22, 20, 30, 30), 0);
-    PrintWallPattern(basic);
-    MoveWallPattern(basic, (Vector2){10, 20});
-    PrintWallPattern(basic);
-    WallPattern* copy = CopyWallPattern(basic);
-    puts("%%%%%%%%");
-    PrintWallPattern(basic);
-    PrintWallPattern(copy);
-    puts("%%%%%%%%");
-    FreeWallPattern(basic);
-    printf("!\n");
-    PrintWallPattern(basic);
-    PrintWallPattern(copy);*/
-    //printf("Note: The game crashes if we don't print to console lol\n");
+    patternList[5] = NewRecPattern(newRec(900, 112 * 3, 20 * 3, 52 * 3), 0);
+    AddRecPattern(patternList[5], newRec(900 + 50 * 3, 46 * 3, 18 * 3, 118* 3), 0);
+    AddRecPattern(patternList[5], newRec(900 + 68 * 3, 149 * 3, 93 * 3, 5 * 3), 2);
+    AddRecPattern(patternList[5], newRec(900 + 68 * 3, 154 * 3, 93 * 3, 15 * 3), 0);
+    AddRecPattern(patternList[5], newRec(900 + 161 * 3, 132 * 3, 17 * 3, 32 * 3), 0);
+    AddRecPattern(patternList[5], newRec(900 + 161 * 3, 0, 17 * 3, 99* 3), 0);
+    AddRecPattern(patternList[5], newRec(900 + 107 *3, 0, 54 * 3, 99  * 3), 0);
 
     #ifdef __EMSCRIPTEN__
         emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
