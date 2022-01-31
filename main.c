@@ -23,69 +23,61 @@ typedef enum GameState{
     STATE_MENU
 }GameState;
 
-
-//idea for patterns:
-    //make them more oriented towards the wall jumping rather than going back and forth
-    //add ceiling
-
-
-float velocity = 0.0f;
-const float gravity = 9.81f * 3.0f;
-const float jumpHeight = -16.0f;
-const float playerSpeed = 325.0f;
-
-const Rectangle ground = {0, 164*3, 900, 100};
-const Rectangle spikes = {0,0,21,507};
-const Rectangle ceiling = {0,-100,900,100};
-
-Rectangle player = {100, 50, 50, 50};
 Texture2D stick;
-Vector2 startingPos = {100, 50};
-
-int wallNum = 0;
-float wallSpeed = -150.0f;
+Texture2D frame;
+Texture2D spikeTexture;
+Texture2D trapz;
+Animation background;
 Animation playerAnim;
 Animation playerAnim_flip;
-Animation pistonAnim;
-
-Texture2D frame;
-Animation background;
-WallPattern* piston;
-WallPattern* basic;
-WallPattern* patternList[6];
-WallPattern** wallsList;
-
-//float timer = 0.0f;
-//float resetTime = 3.0f;
-const float speedUpMultiplier = 1.05f;
-float speedUpTimer = 0.0f;
-const float speedUpResetTime = 4.5f;
-const float wallSpacing = 200.0f;
 
 Music main_music;
 Music menu;
 Sound death_sound;
 
 bool wallJump = false;
-bool jumpDebug = false;
-bool wallHoldDebug = false;
-bool debug = false;
-GameState gameState = STATE_MENU;
-CollisionInfo collision = {0,0,0,0,0,0};
+float velocity = 0.0f;
+const float gravity = 9.81f * 3.0f;
+const float jumpHeight = -16.0f;
+const float playerSpeed = 325.0f;
 
-int trapNum = 0;
-WallPattern** trapParents;
+Rectangle player = {100, 50, 0, 0};
+Vector2 startingPos = {100, 50};
+const Rectangle ground = {0, 492, 900, 100};
+const Rectangle spikes = {0,0,21,507};
+const Rectangle ceiling = {0,-100,900,100};
+
+
+int wallNum = 0;
+WallPattern* patternList[6];
+WallPattern** wallsList;
+
+float wallSpeed = -150.0f;
+float speedUpTimer = 0.0f;
+const float speedUpMultiplier = 1.05f;
+const float speedUpResetTime = 4.5f;
+const float wallSpacing = 200.0f;
+
+
+bool jumpDebug = false;
+bool debug = false;
+
+GameState gameState = STATE_MENU;
+
+CollisionInfo collision = {0,0,0,0,0,0};
 
 GuiText playText;
 GuiBox playBox;
-//GuiText title;
-
-Texture2D spikeTexture;
 
 int score = 0;
 int highscore = 0;
 
-Texture2D trapz;
+//Animation pistonAnim;
+//WallPattern* piston;
+//WallPattern* basic;
+//bool wallHoldDebug = false;
+//int trapNum = 0;
+//WallPattern** trapParents;
 
 void NewWall(){
     wallNum++;
@@ -105,41 +97,16 @@ void NewWall(){
         wallsList[wallNum-1]->next->next->next->anim->texture = trapz;
         printf("Made new animation\n");
     }
-
-
-    
-    //walls = realloc(walls, wallNum * sizeof(Rectangle));
-    //walls[wallNum-1] = patterns[GetRandomValue(0, 3)];
-    
-
-    //printf("Made New Wall, new length: %d\n", wallNum);
 }
 void KillWall(){
-    //int i = 0;
-    //WallPattern* select = wallsList[0];
-    /*while(select != NULL){
-        if(select){
-            for(int s = 0; s < trapNum - 1; i++){
-                wallsList[i] = wallsList[i+1];
-                //walls[i] = walls[i+1];
-            }
-        }
-        select = select->next;
-        i++;
-    }*/
-    
-
     FreeWallPattern(wallsList[0]);
     for(int i = 0; i < wallNum - 1; i++){
         wallsList[i] = wallsList[i+1];
-        //walls[i] = walls[i+1];
     }
     wallNum--;
 }
 
-
-
-void CalculateCollisions(){
+void MoveWalls(){
     for(int i = 0; i < wallNum; i++){
         MoveWallPattern(wallsList[i], (Vector2){wallSpeed * GetFrameTime(), 0});
         score += wallSpeed * GetFrameTime() * -0.5;
@@ -152,9 +119,9 @@ void CalculateCollisions(){
             done = true;
         }
     }
+}
 
-
-        //printf(" ");
+void CalculateCollisions(){
     collision = (CollisionInfo){0,0,0,0,0,0};
     for(int i = 0; i < wallNum; i++){
         collision = CheckAllCollisionsList(collision, wallsList[i], player);
@@ -199,7 +166,6 @@ void CalculateCollisions(){
         }
         wallJump = true;
     }else{
-        //if(((collision.left && IsKeyDown(KEY_A)) || (collision.right && IsKeyDown(KEY_D))) && velocity >= 0) ;else 
         velocity += gravity * GetFrameTime();
         player.y += velocity;
     }
@@ -224,6 +190,14 @@ void DebugVisuals(){
         DrawRectangle(870, 400, 20, 20, wallJump ? YELLOW : WHITE);
 
         DrawRectangleRec(player, (Color){255,0,0,100});
+
+        DrawRectangle(861, 429, 38, 6, 
+            collision.trigger == 0 ? WHITE :
+            collision.trigger == 1 ? RED : 
+            collision.trigger == 2 ? BLUE : 
+            YELLOW
+        );
+        //if(collision.trigger == 2) PlaySound(death_sound);
     }
     if(jumpDebug) DrawText("Debug Mode Enabled.\nReset with R enabled", 0,0,15, WHITE);
     
@@ -236,7 +210,7 @@ void DrawWallPattern(WallPattern* root){
         if(select-> trigger == 1) DrawRectangleRec(select->rec, (Color){255,84-(select->rec.x * 84 / 900),98-(select->rec.x * 98 / 900),255});
         else if(select->trigger == 0)DrawRectangleRec(select->rec, (Color){74-(select->rec.x * 74 / 900),84-(select->rec.x * 84 / 900),98-(select->rec.x * 98 / 900),255});
         if(select->anim != NULL){
-            DrawAnimationPro(select->anim, recToVec(select->rec), 3, WHITE, CYCLE_FORWARD);
+            DrawAnimationPro(select->anim, recToVec(select->rec), 3, WHITE, select->anim->isAnimating ? CYCLE_FORWARD : CYCLE_NONE);
             if(select->anim->isAnimating == false && select->anim->currentFrame == 3) select->trigger = 1;
         }
         select = select->next;
@@ -249,7 +223,6 @@ void GameVisuals(){
     DrawTextureEx(frame, (Vector2){0,0}, 0, 3, WHITE);
     for(int i = 0; i < wallNum; i++){
         DrawWallPattern(wallsList[i]);
-        //DrawRectangleRec(walls[i], (Color){130-(walls[i].x * 130 / 900),130-(walls[i].x * 130 / 900),130-(walls[i].x * 130 / 900),255});
     }
     DrawTextureEx(spikeTexture, (Vector2){0,0}, 0, 3, WHITE);
     
@@ -262,19 +235,7 @@ void GameVisuals(){
 }
 
 void WallTimer(){
-    //timer -= GetFrameTime();
     speedUpTimer -= GetFrameTime();
-    /*if(IsKeyPressed(KEY_F) || timer < 0){
-        //for(int i = 0; i < 1000; i ++){
-        NewWall();
-        timer = resetTime;
-        //}
-    }
-    if(IsKeyPressed(KEY_G) || speedUpTimer < 0){
-        resetTime *= speedUpMultiplier;
-        speedUpTimer = speedUpResetTime;
-        wallSpeed = -250 * 3 / resetTime;
-    }*/
     if(IsKeyPressed(KEY_F)){
         speedUpTimer = speedUpResetTime;
         wallSpeed /= speedUpMultiplier;
@@ -283,14 +244,9 @@ void WallTimer(){
         speedUpTimer = speedUpResetTime;
         wallSpeed *= speedUpMultiplier;
     }
-    //printf("ok\n");
-    //printf("%p\n", wallsList[wallNum-1]);
-    //printf("ok2\n");
     if(wallNum == 0 || (900 - GreatestWallX(wallsList[wallNum-1])) > wallSpacing){
-        //printf("what3\n");
         NewWall();
     }
-    //printf("what4\n");
 }
 
 void BodyFall(){
@@ -300,14 +256,16 @@ void BodyFall(){
     }
     collision = CheckColliderColInfo(collision, ground, player, 0);
     collision = CheckColliderColInfo(collision, ceiling, player, 0);
-    collision = CheckColliderColInfo(collision, spikes, player, 1);
+
+    if(collision.up && velocity < 0){
+        velocity = 0;
+    }
 
     if(collision.down && velocity >= 0){
         player.y = collision.floor - player.height + 0.01f;
         velocity = 0;
         wallJump = true;
     }else{
-        //if(((collision.left && IsKeyDown(KEY_A)) || (collision.right && IsKeyDown(KEY_D))) && velocity >= 0) ;else 
         velocity += gravity * GetFrameTime();
         player.y += velocity;
     }
@@ -340,7 +298,6 @@ void UpdateDrawFrame(){
         player.y = startingPos.y;
         player.width = stick.width * 3;
         player.height = stick.height * 3;
-        //resetTime = 3.0f;
         speedUpTimer = speedUpResetTime;
         score = 0;
         wallSpeed = -150.0f;
@@ -348,17 +305,14 @@ void UpdateDrawFrame(){
             KillWall();
         }
     }
-    ///printf("what\n");
     if(gameState == STATE_ACTIVE){
         if(IsKeyPressed(KEY_R) && jumpDebug){
-            //printf("%f, %f, %f, %f\n", player.x, player.y, player.width, player.height);
             player = RotateRecCW(player);
-            //printf("%f, %f, %f, %f\n", player.x, player.y, player.width, player.height);
             gameState = STATE_DEAD;
             PlaySound(death_sound);
         }
-        //printf("what2\n");
         WallTimer();
+        MoveWalls();
         CalculateCollisions();
     }else if(gameState == STATE_DEAD){
         BodyFall();
@@ -420,13 +374,12 @@ int main(void){
     background = assignProperties(300, 0, 10, true, 4, true);
     background.texture = LoadTexture("resources/background.png");
 
-    pistonAnim = assignProperties(56, 0, 10000, false, 2, false);
-    pistonAnim.texture = LoadTexture("resources/background.png");
+    //pistonAnim = assignProperties(56, 0, 10000, false, 2, false);
+    //pistonAnim.texture = LoadTexture("resources/background.png");
 
-    piston = NewRecPattern(newRec(0,0,pistonAnim.spriteSize * 3, pistonAnim.texture.height * 3), 0);
+    //piston = NewRecPattern(newRec(0,0,pistonAnim.spriteSize * 3, pistonAnim.texture.height * 3), 0);
 
     Font default_font = GetFontDefault();
-    //title = assignGuiText(&default_font, (Vector2){450,100}, negVec2(MeasureTextEx(default_font, "Title", 40, 0)), "Title", 40, WHITE, 0);
 
     playText = assignGuiText(&default_font, (Vector2){450,100}, (Vector2){0,0}, "Play", 40, BLUE, 3);
     playBox = assignGuiBox((Rectangle){0,0,0,0}, &playText, NULL, 1, WHITE, 3, BLACK);
@@ -439,7 +392,7 @@ int main(void){
 
     //pit
     patternList[1] = NewRecPattern(newRec(900, 122 * 3, 23 * 3, 42 * 3), 0);
-    AddRecPattern(patternList[1], newRec(900 + 23 * 3, 152 * 3, 93 * 3, 2 * 3), 2); // animation trigger
+    AddRecPattern(patternList[1], newRec(900 + 23 * 3, 152 * 3, 90 * 3, 5 * 3), 2); // animation trigger
     AddRecPattern(patternList[1], newRec(900 + 23 * 3, 154 * 3, 93 * 3, 15 * 3), 0); // actual death pit
     AddRecPattern(patternList[1], newRec(900 + 116 * 3, 122 * 3, 24 * 3, 42 * 3), 0);
 
